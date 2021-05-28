@@ -23,6 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     private Button btnCityId, btnWeatherById, btnWeatherByName;
     private EditText dataInput;
@@ -44,24 +46,37 @@ public class MainActivity extends AppCompatActivity {
         btnWeatherById.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                weatherDataService.getCityForecastById(dataInput.getText().toString(), new WeatherDataService.VolleyResponseListener() {
-                    @Override
-                    public void onError(String message) {
-                        Toast.makeText(getApplicationContext(),"Something wrong",Toast.LENGTH_SHORT).show();
-                    }
+            weatherDataService.getCityForecastById(dataInput.getText().toString(), new WeatherDataService.ForeCastByIdResponse() {
+                @Override
+                public void onError(String message) {
+                    Toast.makeText(MainActivity.this,"error occurred".toString(),Toast.LENGTH_SHORT).show();
+                }
 
-                    @Override
-                    public void onResponse(String cityId) {
-                        Toast.makeText(getApplicationContext(),"Returned an ID of "+cityId,Toast.LENGTH_SHORT).show();
-                    }
-                });
+                @Override
+                public void onResponse(List<WeatherReportModel> weatherReportModelList) {
+                    ArrayAdapter arrayAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1,weatherReportModelList);
+                    listView.setAdapter(arrayAdapter);
+                }
+            });
+
             }
         });
 
         btnWeatherByName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"You typed "+dataInput.getText().toString(),Toast.LENGTH_SHORT).show();
+                weatherDataService.getCityForecastByName(dataInput.getText().toString(), new WeatherDataService.GetCityForecastByNameCallback() {
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(MainActivity.this,"error occurred".toString(),Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onResponse(List<WeatherReportModel> weatherReportModelList) {
+                        ArrayAdapter arrayAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1,weatherReportModelList);
+                        listView.setAdapter(arrayAdapter);
+                    }
+                });
             }
         });
 
